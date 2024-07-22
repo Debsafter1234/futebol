@@ -16,3 +16,4 @@ public class ClubeAdvice {
                 .body(new BaseResponseDTO(ex.getStatus(), "erro", ex.getMessage()));
     }
 }
+///estou fazendo teste
