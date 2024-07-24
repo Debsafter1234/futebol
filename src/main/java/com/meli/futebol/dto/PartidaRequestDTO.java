@@ -9,9 +9,8 @@ import java.time.LocalDateTime;
 public class PartidaRequestDTO {
     private Long clubeCasaId;
     private Long clubeVisitanteId;
-    private String clubeCasaNome;
-    private String clubeVisitanteNome;
-    private String resultado;
+    private int resultadoCasa;
+    private int resultadoVisitante;
     private String nomeEstadio;
     private LocalDateTime dataHoraPartida;
 

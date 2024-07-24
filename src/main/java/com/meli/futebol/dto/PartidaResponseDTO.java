@@ -9,7 +9,8 @@ public class PartidaResponseDTO {
     private Long id;
     private String clubeCasaNome;
     private String clubeVisitanteNome;
-    private String resultado;
+    private int resultadoCasa;
+    private int resultadoVisitante;
     private String estadio;
     private LocalDateTime dataHora;
 

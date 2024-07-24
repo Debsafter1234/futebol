@@ -1,4 +1,4 @@
-package com.meli.futebol.controller;
+package com.meli.futebol.exeption;
 
 public class ExeptionPersonalizada extends RuntimeException{
 

@@ -2,6 +2,7 @@ package com.meli.futebol.service;
 
 import com.meli.futebol.dto.EstadioRequestDTO;
 import com.meli.futebol.dto.EstadioResponseDTO;
+import com.meli.futebol.exeption.ExeptionPersonalizada;
 import com.meli.futebol.model.Estadio;
 import com.meli.futebol.repository.EstadioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +34,14 @@ public class EstadioService {
         dto.setEstado(estadio.getEstado());
         dto.setQuantidadeMaxima(estadio.getQuantidadeMaxima());
         return dto;
+    }
+
+    public Estadio getEstadioBynome(String nome) {
+        Estadio estadio = estadioRepository.findByNome(nome);
+        if (estadio == null) {
+            throw new ExeptionPersonalizada("Estadio não encontrado", 404);
+        }
+
+        return estadio;
     }
 }

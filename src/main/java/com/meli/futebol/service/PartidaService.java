@@ -1,10 +1,8 @@
 package com.meli.futebol.service;
 
+import com.meli.futebol.exeption.ExeptionPersonalizada;
 import com.meli.futebol.model.Clube;
 import com.meli.futebol.model.Estadio;
-import com.meli.futebol.repository.ClubeRepository;
-import com.meli.futebol.repository.EstadioRepository;
-import lombok.Data;
 
 import com.meli.futebol.dto.PartidaRequestDTO;
 import com.meli.futebol.dto.PartidaResponseDTO;
@@ -15,26 +13,50 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-@Data
 @Service
 public class PartidaService {
 
     @Autowired
-    private ClubeRepository clubeRepository;
+    private ClubeService clubeService;
 
     @Autowired
-    private EstadioRepository estadioRepository;
+    private EstadioService estadioService;
 
     @Autowired
     private PartidaRepository partidaRepository;
 
-    public Partida converterESalvarPartidaRequestDTO(PartidaRequestDTO dto) {
-        Clube clubeCasa = clubeRepository.findById(dto.getClubeCasaId()).orElseThrow();
-        Clube clubeVisitante = clubeRepository.findById(dto.getClubeVisitanteId()).orElseThrow();
-        Estadio estadio = estadioRepository.findByNome(dto.getNomeEstadio());
-        Partida partida = new Partida(clubeCasa, clubeVisitante, dto.getResultado(), estadio, dto.getDataHoraPartida());
+
+
+    public PartidaResponseDTO salvarPartida(PartidaRequestDTO dto) {
+        validarPartida(dto);
+        Clube clubeCasa = clubeService.getClube(dto.getClubeCasaId());
+        Clube clubeVisitante = clubeService.getClube(dto.getClubeVisitanteId());
+        Estadio estadio = estadioService.getEstadioBynome(dto.getNomeEstadio());
+        Partida partida = new Partida(clubeCasa,
+                clubeVisitante,
+                dto.getResultadoVisitante(),
+                dto.getResultadoCasa(),
+                estadio,
+                dto.getDataHoraPartida());
         partidaRepository.save(partida);
-        return partida;
+        return converterPartidaResponseDTO(partida);
+    }
+
+    private void validarPartida(PartidaRequestDTO dto) {
+        if (dto.getClubeCasaId() == dto.getClubeVisitanteId()) {
+            throw new ExeptionPersonalizada("O clube visitante não pode ser o mesmo que o clube da casa", 400);
+        }
+
+        if (dto.getResultadoCasa() < 0 || dto.getResultadoVisitante() < 0) {
+            throw new ExeptionPersonalizada("O resultado da partida não pode ser menor que 0", 400);
+        }
+        if (dto.getDataHoraPartida().isAfter(LocalDateTime.now())) {
+            throw new ExeptionPersonalizada("A data da partida não pode ser no futuro", 400);
+        }
+
+        if (!clubeService.clubeAtivo(dto.getClubeCasaId()) || !clubeService.clubeAtivo(dto.getClubeVisitanteId())) {
+            throw new ExeptionPersonalizada("Um ou mais clubes não estão ativos", 409);
+        }
 
     }
 
@@ -44,33 +66,12 @@ public class PartidaService {
         responseDTO.setClubeCasaNome(partida.getClubeCasa().getNome());
         responseDTO.setClubeVisitanteNome(partida.getClubeVisitante().getNome());
         responseDTO.setDataHora(partida.getDataPartida());
+        responseDTO.setEstadio(partida.getEstadio().getNome());
+        responseDTO.setResultadoCasa(partida.getResultadoCasa());
+        responseDTO.setResultadoVisitante(partida.getResultadoVisitante());
         return responseDTO;
     }
 
 
-//    public PartidaResponseDTO cadastrar(PartidaRequestDTO dto) {
-//      var  partidaSalva = converterESalvarPartidaRequestDTO(dto);
-//        return converterPartidaResponseDTO(partidaSalva);
-//    }
 
-    //    public PartidaResponseDTO cadastrar(PartidaRequestDTO dto) {
-//        Partida novaPartida = converterPartidaRequestDTO(dto);
-//        Partida partidaSalva = partidaRepository.save(novaPartida);
-//        return converterPartidaResponseDTO(partidaSalva);
-//    }
-
-    //    private Partida converterPartidaRequestDTO(PartidaRequestDTO dto) {
-//        Partida partida = new Partida();
-//        partida.setClubeCasa(dto.getClubeCasaId());
-//        partida.setClubeVisitante(dto.getClubeVisitanteId());
-//        partida.setDataPartida(dto.getDataPartida());
-//        return partida;
-//    }
-//
-
-
-//
-//    public PartidaResponseDTO cadastrarPartida(PartidaRequestDTO requestDTO) {
-//        return cadastrar(requestDTO);
-//    }
 }

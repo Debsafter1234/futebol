@@ -1,5 +1,6 @@
 package com.meli.futebol.controller;
 
+import com.meli.futebol.dto.BaseResponseDTO;
 import com.meli.futebol.dto.PartidaRequestDTO;
 import com.meli.futebol.dto.PartidaResponseDTO;
 import com.meli.futebol.service.PartidaService;
@@ -18,9 +19,8 @@ public class PartidaController {
     private PartidaService partidaService;
 
     @PostMapping
-    public ResponseEntity<PartidaResponseDTO> cadastrarPartida(@RequestBody PartidaRequestDTO requestDTO) {
-        var cadastrarPartida = partidaService.converterESalvarPartidaRequestDTO(requestDTO);
-        PartidaResponseDTO responseDTO = partidaService.converterPartidaResponseDTO(cadastrarPartida);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    public ResponseEntity<BaseResponseDTO> cadastrarPartida(@RequestBody PartidaRequestDTO requestDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new BaseResponseDTO(HttpStatus.CREATED.value(), "sucesso", partidaService.salvarPartida(requestDTO)));
     }
 }

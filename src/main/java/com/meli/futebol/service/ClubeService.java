@@ -1,6 +1,6 @@
 package com.meli.futebol.service;
 
-import com.meli.futebol.controller.ExeptionPersonalizada;
+import com.meli.futebol.exeption.ExeptionPersonalizada;
 import com.meli.futebol.dto.ClubeRequestDTO;
 import com.meli.futebol.dto.ClubeResponseDTO;
 import com.meli.futebol.enuns.Status;
@@ -68,6 +68,10 @@ public class ClubeService {
         return converterClube(clube);
     }
 
+    public boolean clubeAtivo(Long idClube) {
+        Status statusClube = clubeRepository.buscarStatusClube(idClube);
+        return statusClube == Status.ATIVO;
+    }
     public List<ClubeResponseDTO> buscarTodos() {
         List<Clube> clubes = clubeRepository.findAll();
         List<ClubeResponseDTO> responseDTOS = new ArrayList<>();
@@ -82,7 +86,8 @@ public class ClubeService {
         }
         return  responseDTOS;
     }
-    private Clube getClube(Long id) {
+
+    public Clube getClube(Long id) {
         return clubeRepository.findById(id)
                 .orElseThrow(() -> new ExeptionPersonalizada("Clube não encontrado", 404));
     }
